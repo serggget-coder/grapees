@@ -3071,5 +3071,1569 @@ if __name__ == "__main__":
 
 
 
+#Глава 3. Цветовые кодировки здоровые, 3 типа болезни. Результаты работы лето 2025
+
+
+
+
+
+from tqdm import tqdm
+import os
+import numpy as np
+from skimage import io, color
+from PIL import Image
+import math
+
+def test_img_folder(folder_path):
+    print(folder_path)
+    if os.path.exists(folder_path):
+        print("Путь существует")
+    else:
+        print("Путь не существует")
+    count = 0
+
+    arr_mean_r = []
+    arr_std_r = []  # Было disp_r, теперь std_r (корень из дисперсии)
+    arr_mean_g = []
+    arr_std_g = []
+    arr_mean_b = []
+    arr_std_b = []
+
+    with os.scandir(folder_path) as entries:
+        for entry in tqdm(entries):
+            if entry.is_file():
+                count += 1
+                image = io.imread(entry.path)
+                data_r = image[:, :, 0].flatten()
+                data_g = image[:, :, 1].flatten()
+                data_b = image[:, :, 2].flatten()
+
+                mean_r = np.mean(data_r)
+                std_r = math.sqrt(np.var(data_r))  # Корень из дисперсии
+
+                mean_g = np.mean(data_g)
+                std_g = math.sqrt(np.var(data_g))
+
+                mean_b = np.mean(data_b)
+                std_b = math.sqrt(np.var(data_b))
+
+                arr_mean_r.append(mean_r)
+                arr_mean_g.append(mean_g)
+                arr_mean_b.append(mean_b)
+                arr_std_r.append(std_r)
+                arr_std_g.append(std_g)
+                arr_std_b.append(std_b)
+
+    result = {
+        "folder_path": folder_path,
+        "num_files": count,
+        "arr_mean_r": arr_mean_r,
+        "arr_mean_g": arr_mean_g,
+        "arr_mean_b": arr_mean_b,
+        "arr_std_r": arr_std_r,  # Было arr_disp_r
+        "arr_std_g": arr_std_g,
+        "arr_std_b": arr_std_b,
+        "m_r": np.mean(arr_mean_r),
+        "m_g": np.mean(arr_mean_g),
+        "m_b": np.mean(arr_mean_b),
+        "std_r": np.mean(arr_std_r),  # Было d_r
+        "std_g": np.mean(arr_std_g),
+        "std_b": np.mean(arr_std_b)
+    }
+
+    return result
+
+def test_img_folder_rgb(tag="tag", folder_path=""):
+    print(folder_path)
+    if os.path.exists(folder_path):
+        print("Путь существует")
+    else:
+        print("Путь не существует")
+    count = 0
+
+    arr_mean_r = []
+    arr_std_r = []
+    arr_mean_g = []
+    arr_std_g = []
+    arr_mean_b = []
+    arr_std_b = []
+    arr_mean_grey = []
+    arr_std_grey = []
+
+    with os.scandir(folder_path) as entries:
+        for entry in tqdm(entries):
+            if entry.is_file():
+                count += 1
+                image = io.imread(entry.path)
+                data_r = image[:, :, 0].flatten()
+                data_g = image[:, :, 1].flatten()
+                data_b = image[:, :, 2].flatten()
+
+                mean_r = np.mean(data_r)
+                std_r = math.sqrt(np.var(data_r))
+
+                mean_g = np.mean(data_g)
+                std_g = math.sqrt(np.var(data_g))
+
+                mean_b = np.mean(data_b)
+                std_b = math.sqrt(np.var(data_b))
+
+                arr_mean_r.append(mean_r)
+                arr_mean_g.append(mean_g)
+                arr_mean_b.append(mean_b)
+                arr_std_r.append(std_r)
+                arr_std_g.append(std_g)
+                arr_std_b.append(std_b)
+
+                gray_image = color.rgb2gray(image)
+                mean_gray = np.mean(gray_image)
+                std_gray = math.sqrt(np.var(gray_image))
+
+                arr_mean_grey.append(mean_gray)
+                arr_std_grey.append(std_gray)
+
+    result = {
+        "tag": tag,
+        "folder_path": folder_path,
+        "num_files": count,
+        "arr_mean_r": arr_mean_r,
+        "arr_mean_g": arr_mean_g,
+        "arr_mean_b": arr_mean_b,
+        "arr_std_r": arr_std_r,
+        "arr_std_g": arr_std_g,
+        "arr_std_b": arr_std_b,
+        "arr_mean_gray": arr_mean_grey,
+        "arr_std_gray": arr_std_grey,
+        "m_r": np.mean(arr_mean_r),
+        "m_g": np.mean(arr_mean_g),
+        "m_b": np.mean(arr_mean_b),
+        "std_r": np.mean(arr_std_r),
+        "std_g": np.mean(arr_std_g),
+        "std_b": np.mean(arr_std_b),
+        "m_gray": np.mean(arr_mean_grey),
+        "std_gray": np.mean(arr_std_grey)
+    }
+
+    return result
+
+def print_result_rgb_grey(result):
+    print(f"|{result['tag']:>10}|{result['m_r']:>10.2f}|{result['std_r']:>10.2f}|"
+          f"{result['m_g']:>10.2f}|{result['std_g']:>10.2f}|"
+          f"{result['m_b']:>10.2f}|{result['std_b']:>10.2f}|"
+          f"{result['m_gray']:>10.2f}|{result['std_gray']:>10.2f}|"
+          f"{result['num_files']:>10}|")
+
+
+
+
+def test_img_folder_yuv(tag="tag", folder_path=""):
+    print(folder_path)
+    if os.path.exists(folder_path):
+        print("Путь существует")
+    else:
+        print("Путь не существует")
+    count = 0
+
+    arr_mean_y = []
+    arr_std_y = []
+    arr_mean_u = []
+    arr_std_u = []
+    arr_mean_v = []
+    arr_std_v = []
+
+    with os.scandir(folder_path) as entries:
+        for entry in tqdm(entries):
+            if entry.is_file():
+                count += 1
+                # Читаем изображение и конвертируем в YUV
+                image = io.imread(entry.path)
+                yuv_image = color.rgb2yuv(image)
+
+                # Масштабируем каналы U и V из [-0.5, 0.5] в [0, 255] для удобства анализа
+                yuv_image[:, :, 1] = (yuv_image[:, :, 1] + 0.5) * 255
+                yuv_image[:, :, 2] = (yuv_image[:, :, 2] + 0.5) * 255
+
+                # Получаем данные каналов
+                data_y = yuv_image[:, :, 0].flatten()
+                data_u = yuv_image[:, :, 1].flatten()
+                data_v = yuv_image[:, :, 2].flatten()
+
+                # Вычисляем статистики
+                mean_y = np.mean(data_y)
+                std_y = math.sqrt(np.var(data_y))
+
+                mean_u = np.mean(data_u)
+                std_u = math.sqrt(np.var(data_u))
+
+                mean_v = np.mean(data_v)
+                std_v = math.sqrt(np.var(data_v))
+
+                # Сохраняем результаты
+                arr_mean_y.append(mean_y)
+                arr_mean_u.append(mean_u)
+                arr_mean_v.append(mean_v)
+                arr_std_y.append(std_y)
+                arr_std_u.append(std_u)
+                arr_std_v.append(std_v)
+
+    result = {
+        "tag": tag,
+        "folder_path": folder_path,
+        "num_files": count,
+        "arr_mean_y": arr_mean_y,
+        "arr_mean_u": arr_mean_u,
+        "arr_mean_v": arr_mean_v,
+        "arr_std_y": arr_std_y,
+        "arr_std_u": arr_std_u,
+        "arr_std_v": arr_std_v,
+        "m_y": np.mean(arr_mean_y),
+        "m_u": np.mean(arr_mean_u),
+        "m_v": np.mean(arr_mean_v),
+        "std_y": np.mean(arr_std_y),
+        "std_u": np.mean(arr_std_u),
+        "std_v": np.mean(arr_std_v)
+    }
+
+    return result
+
+def print_result_yuv(result):
+    print(f"|{result['tag']:>10}|{result['m_y']:>10.2f}|{result['std_y']:>10.2f}|"
+          f"{result['m_u']:>10.2f}|{result['std_u']:>10.2f}|"
+          f"{result['m_v']:>10.2f}|{result['std_v']:>10.2f}|"
+          f"{result['num_files']:>10}|")
+
+
+
+
+
+import os
+import numpy as np
+from skimage import io, color
+from PIL import Image
+import math
+from tqdm import tqdm
+
+def test_img_folder_hsv(tag="tag", folder_path=""):
+    print(folder_path)
+    if os.path.exists(folder_path):
+        print("Путь существует")
+    else:
+        print("Путь не существует")
+    count = 0
+
+    arr_mean_h = []
+    arr_std_h = []
+    arr_mean_s = []
+    arr_std_s = []
+    arr_mean_v = []
+    arr_std_v = []
+
+    with os.scandir(folder_path) as entries:
+        for entry in tqdm(entries):
+            if entry.is_file():
+                count += 1
+                image = io.imread(entry.path)
+                image_hsv = color.rgb2hsv(image)
+
+                data_h = image_hsv[:, :, 0].flatten()
+                data_s = image_hsv[:, :, 1].flatten()
+                data_v = image_hsv[:, :, 2].flatten()
+
+                mean_h = np.mean(data_h)
+                std_h = math.sqrt(np.var(data_h))
+
+                mean_s = np.mean(data_s)
+                std_s = math.sqrt(np.var(data_s))
+
+                mean_v = np.mean(data_v)
+                std_v = math.sqrt(np.var(data_v))
+
+                arr_mean_h.append(mean_h)
+                arr_mean_s.append(mean_s)
+                arr_mean_v.append(mean_v)
+                arr_std_h.append(std_h)
+                arr_std_s.append(std_s)
+                arr_std_v.append(std_v)
+
+    result = {
+        "tag": tag,
+        "folder_path": folder_path,
+        "num_files": count,
+        "arr_mean_h": arr_mean_h,
+        "arr_mean_s": arr_mean_s,
+        "arr_mean_v": arr_mean_v,
+        "arr_std_h": arr_std_h,
+        "arr_std_s": arr_std_s,
+        "arr_std_v": arr_std_v,
+        "m_h": np.mean(arr_mean_h),
+        "m_s": np.mean(arr_mean_s),
+        "m_v": np.mean(arr_mean_v),
+        "std_h": np.mean(arr_std_h),
+        "std_s": np.mean(arr_std_s),
+        "std_v": np.mean(arr_std_v)
+    }
+
+    return result
+
+def print_result_hsv(result):
+    print(f"|{result['tag']:>10}|{result['m_h']:>10.2f}|{result['std_h']:>10.2f}|"
+          f"{result['m_s']:>10.2f}|{result['std_s']:>10.2f}|"
+          f"{result['m_v']:>10.2f}|{result['std_v']:>10.2f}|"
+          f"{result['num_files']:>10}|")
+
+
+
+
+
+
+
+
+def test_img_folder_lab(tag="tag", folder_path=""):
+    print(folder_path)
+    if os.path.exists(folder_path):
+        print("Путь существует")
+    else:
+        print("Путь не существует")
+    count = 0
+
+    arr_mean_l = []
+    arr_std_l = []  # Стандартное отклонение вместо дисперсии
+    arr_mean_a = []
+    arr_std_a = []
+    arr_mean_b = []
+    arr_std_b = []
+
+    with os.scandir(folder_path) as entries:
+        for entry in tqdm(entries):
+            if entry.is_file():
+                count += 1
+                image = io.imread(entry.path)
+
+                # Конвертируем в LAB цветовое пространство
+                lab_image = color.rgb2lab(image)
+
+                # Получаем каналы
+                data_l = lab_image[:, :, 0].flatten()
+                data_a = lab_image[:, :, 1].flatten()
+                data_b = lab_image[:, :, 2].flatten()
+
+                # Вычисляем средние и стандартные отклонения
+                mean_l = np.mean(data_l)
+                std_l = math.sqrt(np.var(data_l))
+
+                mean_a = np.mean(data_a)
+                std_a = math.sqrt(np.var(data_a))
+
+                mean_b = np.mean(data_b)
+                std_b = math.sqrt(np.var(data_b))
+
+                # Сохраняем результаты
+                arr_mean_l.append(mean_l)
+                arr_mean_a.append(mean_a)
+                arr_mean_b.append(mean_b)
+                arr_std_l.append(std_l)
+                arr_std_a.append(std_a)
+                arr_std_b.append(std_b)
+
+    result = {
+        "tag": tag,
+        "folder_path": folder_path,
+        "num_files": count,
+        "arr_mean_l": arr_mean_l,
+        "arr_mean_a": arr_mean_a,
+        "arr_mean_b": arr_mean_b,
+        "arr_std_l": arr_std_l,
+        "arr_std_a": arr_std_a,
+        "arr_std_b": arr_std_b,
+        "m_l": np.mean(arr_mean_l),
+        "m_a": np.mean(arr_mean_a),
+        "m_b": np.mean(arr_mean_b),
+        "std_l": np.mean(arr_std_l),
+        "std_a": np.mean(arr_std_a),
+        "std_b": np.mean(arr_std_b)
+    }
+
+    return result
+
+def print_result_lab(result):
+    print(f"|{result['tag']:>10}|{result['m_l']:>10.2f}|{result['std_l']:>10.2f}|"
+          f"{result['m_a']:>10.2f}|{result['std_a']:>10.2f}|"
+          f"{result['m_b']:>10.2f}|{result['std_b']:>10.2f}|"
+          f"{result['num_files']:>10}|")
+
+
+
+import os
+import cv2
+import numpy as np
+from tqdm import tqdm  # для прогресс-бара (опционально)
+
+# Пути к исходным и выходным данным
+input_paths = {
+    "BlackRot": "/content/drive/MyDrive/Original Data/train/Black Rot02",
+    "ESCA": "/content/drive/MyDrive/Original Data/train/ESCA02",
+    "Healthy": "/content/drive/MyDrive/Original Data/train/Healthy02",
+    "LeafBlight": "/content/drive/MyDrive/Original Data/train/Leaf Blight02",
+}
+
+output_base = "/content/drive/MyDrive/Original Data/train_corrected"
+os.makedirs(output_base, exist_ok=True)
+
+# Функция коррекции "Серый мир"
+def gray_world(image):
+    mean_b = np.mean(image[:, :, 0])
+    mean_g = np.mean(image[:, :, 1])
+    mean_r = np.mean(image[:, :, 2])
+    mean_gray = (mean_b + mean_g + mean_r) / 3.0
+
+    scale_b = mean_gray / (mean_b + 1e-6)  # +1e-6 чтобы избежать деления на 0
+    scale_g = mean_gray / (mean_g + 1e-6)
+    scale_r = mean_gray / (mean_r + 1e-6)
+
+    corrected = image.copy().astype(np.float32)
+    corrected[:, :, 0] = np.clip(corrected[:, :, 0] * scale_b, 0, 255)
+    corrected[:, :, 1] = np.clip(corrected[:, :, 1] * scale_g, 0, 255)
+    corrected[:, :, 2] = np.clip(corrected[:, :, 2] * scale_r, 0, 255)
+
+    return corrected.astype(np.uint8)
+
+# Обработка всех изображений
+for class_name, input_path in input_paths.items():
+    output_path = os.path.join(output_base, f"{class_name}_corrected")
+    os.makedirs(output_path, exist_ok=True)
+
+    print(f"Обработка: {class_name}...")
+    for filename in tqdm(os.listdir(input_path)):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            img_path = os.path.join(input_path, filename)
+            img = cv2.imread(img_path)
+
+            if img is not None:
+                corrected_img = gray_world(img)
+                cv2.imwrite(os.path.join(output_path, filename), corrected_img)
+
+print("Готово! Результаты сохранены в:", output_base)
+
+
+
+
+
+import cv2
+import os
+from tqdm import tqdm
+
+# Пути к папкам с изображениями
+paths = [
+    "/content/drive/MyDrive/Original Data/train_corrected/BlackRot_corrected",
+    "/content/drive/MyDrive/Original Data/train_corrected/ESCA_corrected",
+    "/content/drive/MyDrive/Original Data/train_corrected/Healthy_corrected",
+    "/content/drive/MyDrive/Original Data/train_corrected/LeafBlight_corrected"
+]
+
+# Параметры обработки
+blur_kernel = (5, 5)  # Размер ядра для фильтра усреднения
+alpha = 1.5           # Коэффициент контрастности
+beta = 50             # Сдвиг яркости
+
+def process_images(input_path):
+    # Создаем подпапки для результатов
+    base_name = os.path.basename(input_path)
+    output_path_blur = os.path.join("/content/drive/MyDrive/Processed Data", f"{base_name}_blur")
+    output_path_sobel = os.path.join("/content/drive/MyDrive/Processed Data", f"{base_name}_sobel")
+    output_path_contrast = os.path.join("/content/drive/MyDrive/Processed Data", f"{base_name}_contrast")
+
+    os.makedirs(output_path_blur, exist_ok=True)
+    os.makedirs(output_path_sobel, exist_ok=True)
+    os.makedirs(output_path_contrast, exist_ok=True)
+
+    # Обрабатываем все изображения в папке
+    for filename in tqdm(os.listdir(input_path)):
+        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+            img_path = os.path.join(input_path, filename)
+
+            try:
+                # Чтение изображения
+                image = cv2.imread(img_path)
+
+                # 1. Применение фильтра усреднения
+                blurred = cv2.blur(image, blur_kernel)
+                cv2.imwrite(os.path.join(output_path_blur, filename), blurred)
+
+                # 2. Применение фильтра Собеля (в градациях серого)
+                gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                sobel_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0)
+                sobel_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1)
+                sobel_combined = cv2.addWeighted(sobel_x, 0.5, sobel_y, 0.5, 0)
+                cv2.imwrite(os.path.join(output_path_sobel, filename), sobel_combined)
+
+                # 3. Изменение контрастности и яркости
+                contrasted = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
+                cv2.imwrite(os.path.join(output_path_contrast, filename), contrasted)
+
+            except Exception as e:
+                print(f"Ошибка при обработке {filename}: {str(e)}")
+
+# Обрабатываем все указанные папки
+for path in paths:
+    print(f"Обработка папки: {path}")
+    process_images(path)
+
+
+
+
+from tqdm import tqdm
+import os
+import numpy as np
+from skimage import io
+from tabulate import tabulate
+
+headers = ["Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers1 = ["Tag","Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers_yuv = ["Tag","Mean Y", "Disp Y", "Mean U", "Disp U", "Mean V", "Disp V", "Files"]
+headers_hsv = ["Tag","Mean H", "Disp H", "Mean S", "Disp S", "Mean V", "Disp V", "Files"]
+headers_lab = ["Tag","Mean L", "Disp L", "Mean a", "Disp a", "Mean b", "Disp b", "Files"]
+
+folder_paths = {
+"BlackRot":"/content/drive/MyDrive/Original Data/train_corrected/BlackRot_corrected",
+"ESCA":"/content/drive/MyDrive/Original Data/train_corrected/ESCA_corrected",
+"Healthy":"/content/drive/MyDrive/Original Data/train_corrected/Healthy_corrected",
+"LeafBlight":"/content/drive/MyDrive/Original Data/train_corrected/LeafBlight_corrected"
+}
+
+
+
+
+
+result_Healthy=test_img_folder_rgb(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_rgb(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_rgb(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_rgb(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers1))
+
+
+print_result_rgb_grey(result_Healthy)
+
+print_result_rgb_grey(result_BlackRot)
+
+print_result_rgb_grey(result_ESCA)
+
+print_result_rgb_grey(result_LeafBlight)
+
+
+
+
+result_Healthy=test_img_folder_yuv(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_yuv(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_yuv(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_yuv(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_yuv))
+print_result_yuv(result_Healthy)
+print_result_yuv(result_BlackRot)
+print_result_yuv(result_ESCA)
+print_result_yuv(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_hsv(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_hsv(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_hsv(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_hsv(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_hsv))
+print_result_hsv(result_Healthy)
+print_result_hsv(result_BlackRot)
+print_result_hsv(result_ESCA)
+print_result_hsv(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_lab(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_lab(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_lab(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_lab(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_lab))
+print_result_lab(result_Healthy)
+print_result_lab(result_BlackRot)
+print_result_lab(result_ESCA)
+print_result_lab(result_LeafBlight)
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_color_features(results, space='rgb'):
+    """
+    Построение диаграмм цветовых признаков
+    :param results: список результатов (dict) от функций test_img_folder_*
+    :param space: цветовое пространство ('rgb', 'gray', 'yuv', 'hsv', 'lab')
+    """
+    tags = [res['tag'] for res in results]
+
+    if space == 'rgb':
+        # RGB диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_r = [res['m_r'] for res in results]
+        means_g = [res['m_g'] for res in results]
+        means_b = [res['m_b'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_r, width, label='Red', color='r')
+        ax1.bar(x, means_g, width, label='Green', color='g')
+        ax1.bar(x + width, means_b, width, label='Blue', color='b')
+        ax1.set_title('Средние значения RGB каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_r = [res['std_r'] for res in results]
+        stds_g = [res['std_g'] for res in results]
+        stds_b = [res['std_b'] for res in results]
+
+        ax2.bar(x - width, stds_r, width, label='Red', color='r')
+        ax2.bar(x, stds_g, width, label='Green', color='g')
+        ax2.bar(x + width, stds_b, width, label='Blue', color='b')
+        ax2.set_title('Стандартные отклонения RGB каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'gray':
+        # Grayscale диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means = [res['m_gray'] for res in results]
+        ax1.bar(tags, means, color='gray')
+        ax1.set_title('Средние значения Grayscale')
+
+        # Стандартные отклонения
+        stds = [res['std_gray'] for res in results]
+        ax2.bar(tags, stds, color='gray')
+        ax2.set_title('Стандартные отклонения Grayscale')
+
+    elif space == 'yuv':
+        # YUV диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_y = [res['m_y'] for res in results]
+        means_u = [res['m_u'] for res in results]
+        means_v = [res['m_v'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_y, width, label='Y', color='y')
+        ax1.bar(x, means_u, width, label='U', color='cyan')
+        ax1.bar(x + width, means_v, width, label='V', color='magenta')
+        ax1.set_title('Средние значения YUV каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_y = [res['std_y'] for res in results]
+        stds_u = [res['std_u'] for res in results]
+        stds_v = [res['std_v'] for res in results]
+
+        ax2.bar(x - width, stds_y, width, label='Y', color='y')
+        ax2.bar(x, stds_u, width, label='U', color='cyan')
+        ax2.bar(x + width, stds_v, width, label='V', color='magenta')
+        ax2.set_title('Стандартные отклонения YUV каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'hsv':
+        # HSV диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_h = [res['m_h'] for res in results]
+        means_s = [res['m_s'] for res in results]
+        means_v = [res['m_v'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_h, width, label='Hue', color='purple')
+        ax1.bar(x, means_s, width, label='Saturation', color='green')
+        ax1.bar(x + width, means_v, width, label='Value', color='blue')
+        ax1.set_title('Средние значения HSV каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_h = [res['std_h'] for res in results]
+        stds_s = [res['std_s'] for res in results]
+        stds_v = [res['std_v'] for res in results]
+
+        ax2.bar(x - width, stds_h, width, label='Hue', color='purple')
+        ax2.bar(x, stds_s, width, label='Saturation', color='green')
+        ax2.bar(x + width, stds_v, width, label='Value', color='blue')
+        ax2.set_title('Стандартные отклонения HSV каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'lab':
+        # LAB диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_l = [res['m_l'] for res in results]
+        means_a = [res['m_a'] for res in results]
+        means_b = [res['m_b'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_l, width, label='L', color='gray')
+        ax1.bar(x, means_a, width, label='A', color='red')
+        ax1.bar(x + width, means_b, width, label='B', color='blue')
+        ax1.set_title('Средние значения LAB каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_l = [res['std_l'] for res in results]
+        stds_a = [res['std_a'] for res in results]
+        stds_b = [res['std_b'] for res in results]
+
+        ax2.bar(x - width, stds_l, width, label='L', color='gray')
+        ax2.bar(x, stds_a, width, label='A', color='red')
+        ax2.bar(x + width, stds_b, width, label='B', color='blue')
+        ax2.set_title('Стандартные отклонения LAB каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Пример использования:
+# Получаем результаты для разных классов
+results = [
+    test_img_folder_rgb("Healthy", "/content/drive/MyDrive/Original Data/train_corrected/Healthy_corrected"),
+    test_img_folder_rgb("BlackRot", "/content/drive/MyDrive/Original Data/train_corrected/BlackRot_corrected"),
+    test_img_folder_rgb("ESCA", "/content/drive/MyDrive/Original Data/train_corrected/ESCA_corrected"),
+    test_img_folder_rgb("LeafBlight", "/content/drive/MyDrive/Original Data/train_corrected/LeafBlight_corrected")
+]
+
+# Строим диаграммы для RGB
+plot_color_features(results, space='rgb')
+
+# Строим диаграммы для Grayscale
+plot_color_features(results, space='gray')
+
+
+
+
+hsv_results = [
+    test_img_folder_hsv("Healthy", "/content/drive/MyDrive/Original Data/train_corrected/Healthy_corrected"),
+    test_img_folder_hsv("BlackRot", "/content/drive/MyDrive/Original Data/train_corrected/BlackRot_corrected"),
+    test_img_folder_hsv("ESCA", "/content/drive/MyDrive/Original Data/train_corrected/ESCA_corrected"),
+    test_img_folder_hsv("LeafBlight", "/content/drive/MyDrive/Original Data/train_corrected/LeafBlight_corrected")
+]
+plot_color_features(hsv_results, space='hsv')
+
+
+yuv_results = [
+    test_img_folder_yuv("Healthy", "/content/drive/MyDrive/Original Data/train_corrected/Healthy_corrected"),
+    test_img_folder_yuv("BlackRot", "/content/drive/MyDrive/Original Data/train_corrected/BlackRot_corrected"),
+    test_img_folder_yuv("ESCA", "/content/drive/MyDrive/Original Data/train_corrected/ESCA_corrected"),
+    test_img_folder_yuv("LeafBlight", "/content/drive/MyDrive/Original Data/train_corrected/LeafBlight_corrected")
+]
+plot_color_features(yuv_results, space='yuv')
+
+lab_results = [
+    test_img_folder_lab("Healthy", "/content/drive/MyDrive/Original Data/train_corrected/Healthy_corrected"),
+    test_img_folder_lab("BlackRot", "/content/drive/MyDrive/Original Data/train_corrected/BlackRot_corrected"),
+    test_img_folder_lab("ESCA", "/content/drive/MyDrive/Original Data/train_corrected/ESCA_corrected"),
+    test_img_folder_lab("LeafBlight", "/content/drive/MyDrive/Original Data/train_corrected/LeafBlight_corrected")
+]
+plot_color_features(lab_results, space='lab')
+
+
+
+
+
+from tqdm import tqdm
+import os
+import numpy as np
+from skimage import io
+from tabulate import tabulate
+
+headers = ["Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers1 = ["Tag","Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers_yuv = ["Tag","Mean Y", "Disp Y", "Mean U", "Disp U", "Mean V", "Disp V", "Files"]
+headers_hsv = ["Tag","Mean H", "Disp H", "Mean S", "Disp S", "Mean V", "Disp V", "Files"]
+headers_lab = ["Tag","Mean L", "Disp L", "Mean a", "Disp a", "Mean b", "Disp b", "Files"]
+
+folder_paths = {
+"BlackRot":"/content/drive/MyDrive/Processed Data/BlackRot_corrected_blur",
+"ESCA":"/content/drive/MyDrive/Processed Data/ESCA_corrected_blur",
+"Healthy":"/content/drive/MyDrive/Processed Data/Healthy_corrected_blur",
+"LeafBlight":"/content/drive/MyDrive/Processed Data/LeafBlight_corrected_blur"
+}
+
+
+result_Healthy=test_img_folder_rgb(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_rgb(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_rgb(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_rgb(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers1))
+
+
+print_result_rgb_grey(result_Healthy)
+
+print_result_rgb_grey(result_BlackRot)
+
+print_result_rgb_grey(result_ESCA)
+
+print_result_rgb_grey(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_yuv(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_yuv(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_yuv(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_yuv(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_yuv))
+print_result_yuv(result_Healthy)
+print_result_yuv(result_BlackRot)
+print_result_yuv(result_ESCA)
+print_result_yuv(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_hsv(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_hsv(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_hsv(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_hsv(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_hsv))
+print_result_hsv(result_Healthy)
+print_result_hsv(result_BlackRot)
+print_result_hsv(result_ESCA)
+print_result_hsv(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_lab(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_lab(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_lab(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_lab(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_lab))
+print_result_lab(result_Healthy)
+print_result_lab(result_BlackRot)
+print_result_lab(result_ESCA)
+print_result_lab(result_LeafBlight)
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_color_features(results, space='rgb'):
+    """
+    Построение диаграмм цветовых признаков
+    :param results: список результатов (dict) от функций test_img_folder_*
+    :param space: цветовое пространство ('rgb', 'gray', 'yuv', 'hsv', 'lab')
+    """
+    tags = [res['tag'] for res in results]
+
+    if space == 'rgb':
+        # RGB диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_r = [res['m_r'] for res in results]
+        means_g = [res['m_g'] for res in results]
+        means_b = [res['m_b'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_r, width, label='Red', color='r')
+        ax1.bar(x, means_g, width, label='Green', color='g')
+        ax1.bar(x + width, means_b, width, label='Blue', color='b')
+        ax1.set_title('Средние значения RGB каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_r = [res['std_r'] for res in results]
+        stds_g = [res['std_g'] for res in results]
+        stds_b = [res['std_b'] for res in results]
+
+        ax2.bar(x - width, stds_r, width, label='Red', color='r')
+        ax2.bar(x, stds_g, width, label='Green', color='g')
+        ax2.bar(x + width, stds_b, width, label='Blue', color='b')
+        ax2.set_title('Стандартные отклонения RGB каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'gray':
+        # Grayscale диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means = [res['m_gray'] for res in results]
+        ax1.bar(tags, means, color='gray')
+        ax1.set_title('Средние значения Grayscale')
+
+        # Стандартные отклонения
+        stds = [res['std_gray'] for res in results]
+        ax2.bar(tags, stds, color='gray')
+        ax2.set_title('Стандартные отклонения Grayscale')
+
+    elif space == 'yuv':
+        # YUV диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_y = [res['m_y'] for res in results]
+        means_u = [res['m_u'] for res in results]
+        means_v = [res['m_v'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_y, width, label='Y', color='y')
+        ax1.bar(x, means_u, width, label='U', color='cyan')
+        ax1.bar(x + width, means_v, width, label='V', color='magenta')
+        ax1.set_title('Средние значения YUV каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_y = [res['std_y'] for res in results]
+        stds_u = [res['std_u'] for res in results]
+        stds_v = [res['std_v'] for res in results]
+
+        ax2.bar(x - width, stds_y, width, label='Y', color='y')
+        ax2.bar(x, stds_u, width, label='U', color='cyan')
+        ax2.bar(x + width, stds_v, width, label='V', color='magenta')
+        ax2.set_title('Стандартные отклонения YUV каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'hsv':
+        # HSV диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_h = [res['m_h'] for res in results]
+        means_s = [res['m_s'] for res in results]
+        means_v = [res['m_v'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_h, width, label='Hue', color='purple')
+        ax1.bar(x, means_s, width, label='Saturation', color='green')
+        ax1.bar(x + width, means_v, width, label='Value', color='blue')
+        ax1.set_title('Средние значения HSV каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_h = [res['std_h'] for res in results]
+        stds_s = [res['std_s'] for res in results]
+        stds_v = [res['std_v'] for res in results]
+
+        ax2.bar(x - width, stds_h, width, label='Hue', color='purple')
+        ax2.bar(x, stds_s, width, label='Saturation', color='green')
+        ax2.bar(x + width, stds_v, width, label='Value', color='blue')
+        ax2.set_title('Стандартные отклонения HSV каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'lab':
+        # LAB диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_l = [res['m_l'] for res in results]
+        means_a = [res['m_a'] for res in results]
+        means_b = [res['m_b'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_l, width, label='L', color='gray')
+        ax1.bar(x, means_a, width, label='A', color='red')
+        ax1.bar(x + width, means_b, width, label='B', color='blue')
+        ax1.set_title('Средние значения LAB каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_l = [res['std_l'] for res in results]
+        stds_a = [res['std_a'] for res in results]
+        stds_b = [res['std_b'] for res in results]
+
+        ax2.bar(x - width, stds_l, width, label='L', color='gray')
+        ax2.bar(x, stds_a, width, label='A', color='red')
+        ax2.bar(x + width, stds_b, width, label='B', color='blue')
+        ax2.set_title('Стандартные отклонения LAB каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Пример использования:
+# Получаем результаты для разных классов
+results = [
+    test_img_folder_rgb("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_blur"),
+    test_img_folder_rgb("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_blur"),
+    test_img_folder_rgb("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_blur"),
+    test_img_folder_rgb("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_blur")
+]
+
+# Строим диаграммы для RGB
+plot_color_features(results, space='rgb')
+
+# Строим диаграммы для Grayscale
+plot_color_features(results, space='gray')
+
+
+
+
+hsv_results = [
+    test_img_folder_hsv("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_blur"),
+    test_img_folder_hsv("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_blur"),
+    test_img_folder_hsv("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_blur"),
+    test_img_folder_hsv("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_blur")
+]
+plot_color_features(hsv_results, space='hsv')
+
+
+yuv_results = [
+    test_img_folder_yuv("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_blur"),
+    test_img_folder_yuv("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_blur"),
+    test_img_folder_yuv("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_blur"),
+    test_img_folder_yuv("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_blur")
+]
+plot_color_features(yuv_results, space='yuv')
+
+lab_results = [
+    test_img_folder_lab("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_blur"),
+    test_img_folder_lab("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_blur"),
+    test_img_folder_lab("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_blur"),
+    test_img_folder_lab("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_blur")
+]
+plot_color_features(lab_results, space='lab')
+
+
+
+from tqdm import tqdm
+import os
+import numpy as np
+from skimage import io
+from tabulate import tabulate
+
+headers = ["Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers1 = ["Tag","Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers_yuv = ["Tag","Mean Y", "Disp Y", "Mean U", "Disp U", "Mean V", "Disp V", "Files"]
+headers_hsv = ["Tag","Mean H", "Disp H", "Mean S", "Disp S", "Mean V", "Disp V", "Files"]
+headers_lab = ["Tag","Mean L", "Disp L", "Mean a", "Disp a", "Mean b", "Disp b", "Files"]
+
+folder_paths = {
+"BlackRot":"/content/drive/MyDrive/Processed Data/BlackRot_corrected_sobel",
+"ESCA":"/content/drive/MyDrive/Processed Data/ESCA_corrected_sobel",
+"Healthy":"/content/drive/MyDrive/Processed Data/Healthy_corrected_sobel",
+"LeafBlight":"/content/drive/MyDrive/Processed Data/LeafBlight_corrected_sobel"
+}
+
+
+from tqdm import tqdm
+import os
+import numpy as np
+from skimage import io
+import math
+
+def analyze_grayscale_folder(tag="tag", folder_path=""):
+    """
+    Анализирует папку с чёрно-белыми изображениями
+    Возвращает статистики по яркости
+    """
+    print(f"Анализируем папку: {folder_path}")
+
+    if not os.path.exists(folder_path):
+        print("Ошибка: путь не существует")
+        return None
+
+    count = 0
+    arr_mean = []    # Средняя яркость
+    arr_std = []     # Стандартное отклонение
+    arr_min = []      # Минимальная яркость
+    arr_max = []      # Максимальная яркость
+
+    with os.scandir(folder_path) as entries:
+        for entry in tqdm(entries):
+            if entry.is_file() and entry.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+                try:
+                    # Загружаем изображение в градациях серого
+                    image = io.imread(entry.path, as_gray=True)
+
+                    # Проверяем что изображение 2D (чёрно-белое)
+                    if len(image.shape) != 2:
+                        print(f"Пропускаем {entry.name} - не чёрно-белое изображение")
+                        continue
+
+                    # Нормализуем значения пикселей к [0, 255] если нужно
+                    if image.max() <= 1.0:
+                        image = (image * 255).astype(np.uint8)
+
+                    # Вычисляем статистики
+                    pixels = image.flatten()
+                    arr_mean.append(np.mean(pixels))
+                    arr_std.append(math.sqrt(np.var(pixels)))
+                    arr_min.append(np.min(pixels))
+                    arr_max.append(np.max(pixels))
+
+                    count += 1
+                except Exception as e:
+                    print(f"Ошибка обработки {entry.name}: {str(e)}")
+
+    if count == 0:
+        print("Нет подходящих изображений в папке")
+        return None
+
+    # Собираем результаты
+    result = {
+        "tag": tag,
+        "num_files": count,
+        "mean_brightness": np.mean(arr_mean),
+        "std_brightness": np.mean(arr_std),
+        "min_brightness": np.mean(arr_min),
+        "max_brightness": np.mean(arr_max),
+        "all_means": arr_mean,
+        "all_stds": arr_std,
+        "all_mins": arr_min,
+        "all_maxs": arr_max
+    }
+
+    return result
+
+def print_grayscale_stats(result):
+    """Выводит статистики в табличном формате"""
+    print("\nРезультаты анализа чёрно-белых изображений:")
+    print(f"| {'Метка':<10} | {'Файлов':<6} | {'Ср.ярк.':<7} | {'Ст.откл.':<7} | {'Мин.':<5} | {'Макс.':<5} |")
+    print("-"*60)
+    print(f"| {result['tag']:<10} | {result['num_files']:<6} | {result['mean_brightness']:7.2f} | "
+          f"{result['std_brightness']:7.2f} | {result['min_brightness']:5.1f} | {result['max_brightness']:5.1f} |")
+
+# Пример использования:
+folder_paths = {
+      "BlackRot":"/content/drive/MyDrive/Processed Data/BlackRot_corrected_sobel",
+      "ESCA":"/content/drive/MyDrive/Processed Data/ESCA_corrected_sobel",
+      "Healthy":"/content/drive/MyDrive/Processed Data/Healthy_corrected_sobel",
+      "LeafBlight":"/content/drive/MyDrive/Processed Data/LeafBlight_corrected_sobel"
+}
+
+results = []
+for name, path in folder_paths.items():
+    res = analyze_grayscale_folder(tag=name, folder_path=path)
+    if res:
+        results.append(res)
+        print_grayscale_stats(res)
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
+
+def visualize_grayscale_results(results):
+    """
+    Визуализирует результаты анализа чёрно-белых изображений
+    :param results: список результатов от analyze_grayscale_folder()
+    """
+    if not results:
+        print("Нет данных для визуализации")
+        return
+
+    # Подготовка данных
+    tags = [res['tag'] for res in results]
+    means = [res['mean_brightness'] for res in results]
+    stds = [res['std_brightness'] for res in results]
+    mins = [res['min_brightness'] for res in results]
+    maxs = [res['max_brightness'] for res in results]
+
+    # 1. Сравнительная диаграмма средних яркостей
+    plt.figure(figsize=(10, 6))
+    bars = plt.bar(tags, means, color='gray', alpha=0.7)
+    plt.title('Средняя яркость изображений по категориям')
+    plt.ylabel('Яркость (0-255)')
+    plt.ylim(0, 255)
+
+    # Добавляем значения на столбцы
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height,
+                f'{height:.1f}',
+                ha='center', va='bottom')
+
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.show()
+
+    # 2. Диаграмма размаха яркостей (min, mean, max)
+    plt.figure(figsize=(12, 6))
+
+    for i, res in enumerate(results):
+        # Линия от min до max
+        plt.plot([i, i], [res['min_brightness'], res['max_brightness']],
+                color='gray', alpha=0.5, linewidth=2)
+        # Прямоугольник для среднего ± std
+        plt.plot([i-0.2, i+0.2], [res['mean_brightness'], res['mean_brightness']],
+                color='black', linewidth=3)
+        plt.plot([i-0.1, i+0.1],
+                [res['mean_brightness'] - res['std_brightness'],
+                 res['mean_brightness'] - res['std_brightness']],
+                color='red', linewidth=2)
+        plt.plot([i-0.1, i+0.1],
+                [res['mean_brightness'] + res['std_brightness'],
+                 res['mean_brightness'] + res['std_brightness']],
+                color='red', linewidth=2)
+
+    plt.xticks(range(len(tags)), tags)
+    plt.title('Разброс яркостей по категориям\n(черная линия = среднее, красные = ± ст.отклонение)')
+    plt.ylabel('Яркость (0-255)')
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.show()
+
+    # 3. Совмещённые гистограммы распределения яркостей
+    plt.figure(figsize=(12, 6))
+
+    for res in results:
+        sns.kdeplot(res['all_means'], label=res['tag'], linewidth=2)
+
+    plt.title('Распределение средних яркостей по изображениям')
+    plt.xlabel('Яркость')
+    plt.ylabel('Плотность распределения')
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.show()
+
+    # 4. Boxplot для сравнения распределений
+    plt.figure(figsize=(12, 6))
+
+    data_to_plot = [res['all_means'] for res in results]
+    plt.boxplot(data_to_plot, labels=tags, patch_artist=True,
+               boxprops=dict(facecolor='lightgray', color='gray'),
+               medianprops=dict(color='black'))
+
+    plt.title('Сравнение распределений яркостей (boxplot)')
+    plt.ylabel('Яркость')
+    plt.grid(True, linestyle='--', alpha=0.5)
+    plt.show()
+
+# Пример использования с предыдущим кодом анализа:
+folder_paths = {
+      "BlackRot":"/content/drive/MyDrive/Processed Data/BlackRot_corrected_sobel",
+      "ESCA":"/content/drive/MyDrive/Processed Data/ESCA_corrected_sobel",
+      "Healthy":"/content/drive/MyDrive/Processed Data/Healthy_corrected_sobel",
+      "LeafBlight":"/content/drive/MyDrive/Processed Data/LeafBlight_corrected_sobel"
+}
+
+# Анализируем изображения
+results = []
+for name, path in folder_paths.items():
+    res = analyze_grayscale_folder(tag=name, folder_path=path)
+    if res:
+        results.append(res)
+        print_grayscale_stats(res)
+
+# Визуализируем результаты
+if results:
+    visualize_grayscale_results(results)
+else:
+    print("Не удалось получить результаты для визуализации")
+
+
+
+
+
+
+from tqdm import tqdm
+import os
+import numpy as np
+from skimage import io
+from tabulate import tabulate
+
+headers = ["Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers1 = ["Tag","Mean R", "Disp R", "Mean G", "Disp G", "Mean B", "Disp B", "Mean GR", "Disp GR", "Files"]
+headers_yuv = ["Tag","Mean Y", "Disp Y", "Mean U", "Disp U", "Mean V", "Disp V", "Files"]
+headers_hsv = ["Tag","Mean H", "Disp H", "Mean S", "Disp S", "Mean V", "Disp V", "Files"]
+headers_lab = ["Tag","Mean L", "Disp L", "Mean a", "Disp a", "Mean b", "Disp b", "Files"]
+
+folder_paths = {
+"BlackRot":"/content/drive/MyDrive/Processed Data/BlackRot_corrected_contrast",
+"ESCA":"/content/drive/MyDrive/Processed Data/ESCA_corrected_contrast",
+"Healthy":"/content/drive/MyDrive/Processed Data/Healthy_corrected_contrast",
+"LeafBlight":"/content/drive/MyDrive/Processed Data/LeafBlight_corrected_contrast"
+}
+
+
+
+
+
+result_Healthy=test_img_folder_yuv(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_yuv(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_yuv(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_yuv(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_yuv))
+print_result_yuv(result_Healthy)
+print_result_yuv(result_BlackRot)
+print_result_yuv(result_ESCA)
+print_result_yuv(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_hsv(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_hsv(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_hsv(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_hsv(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_hsv))
+print_result_hsv(result_Healthy)
+print_result_hsv(result_BlackRot)
+print_result_hsv(result_ESCA)
+print_result_hsv(result_LeafBlight)
+
+
+result_Healthy=test_img_folder_lab(tag="Healthy",folder_path=folder_paths["Healthy"])
+result_BlackRot=test_img_folder_lab(tag="BlackRot",folder_path=folder_paths["BlackRot"])
+result_ESCA=test_img_folder_lab(tag="ESCA",folder_path=folder_paths["ESCA"])
+result_LeafBlight=test_img_folder_lab(tag="LeafBlight",folder_path=folder_paths["LeafBlight"])
+
+print("".join(f"|{h:<{10}}" for h in headers_lab))
+print_result_lab(result_Healthy)
+print_result_lab(result_BlackRot)
+print_result_lab(result_ESCA)
+print_result_lab(result_LeafBlight)
+
+
+import matplotlib.pyplot as plt
+import numpy as np
+
+def plot_color_features(results, space='rgb'):
+    """
+    Построение диаграмм цветовых признаков
+    :param results: список результатов (dict) от функций test_img_folder_*
+    :param space: цветовое пространство ('rgb', 'gray', 'yuv', 'hsv', 'lab')
+    """
+    tags = [res['tag'] for res in results]
+
+    if space == 'rgb':
+        # RGB диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_r = [res['m_r'] for res in results]
+        means_g = [res['m_g'] for res in results]
+        means_b = [res['m_b'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_r, width, label='Red', color='r')
+        ax1.bar(x, means_g, width, label='Green', color='g')
+        ax1.bar(x + width, means_b, width, label='Blue', color='b')
+        ax1.set_title('Средние значения RGB каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_r = [res['std_r'] for res in results]
+        stds_g = [res['std_g'] for res in results]
+        stds_b = [res['std_b'] for res in results]
+
+        ax2.bar(x - width, stds_r, width, label='Red', color='r')
+        ax2.bar(x, stds_g, width, label='Green', color='g')
+        ax2.bar(x + width, stds_b, width, label='Blue', color='b')
+        ax2.set_title('Стандартные отклонения RGB каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'gray':
+        # Grayscale диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means = [res['m_gray'] for res in results]
+        ax1.bar(tags, means, color='gray')
+        ax1.set_title('Средние значения Grayscale')
+
+        # Стандартные отклонения
+        stds = [res['std_gray'] for res in results]
+        ax2.bar(tags, stds, color='gray')
+        ax2.set_title('Стандартные отклонения Grayscale')
+
+    elif space == 'yuv':
+        # YUV диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_y = [res['m_y'] for res in results]
+        means_u = [res['m_u'] for res in results]
+        means_v = [res['m_v'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_y, width, label='Y', color='y')
+        ax1.bar(x, means_u, width, label='U', color='cyan')
+        ax1.bar(x + width, means_v, width, label='V', color='magenta')
+        ax1.set_title('Средние значения YUV каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_y = [res['std_y'] for res in results]
+        stds_u = [res['std_u'] for res in results]
+        stds_v = [res['std_v'] for res in results]
+
+        ax2.bar(x - width, stds_y, width, label='Y', color='y')
+        ax2.bar(x, stds_u, width, label='U', color='cyan')
+        ax2.bar(x + width, stds_v, width, label='V', color='magenta')
+        ax2.set_title('Стандартные отклонения YUV каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'hsv':
+        # HSV диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_h = [res['m_h'] for res in results]
+        means_s = [res['m_s'] for res in results]
+        means_v = [res['m_v'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_h, width, label='Hue', color='purple')
+        ax1.bar(x, means_s, width, label='Saturation', color='green')
+        ax1.bar(x + width, means_v, width, label='Value', color='blue')
+        ax1.set_title('Средние значения HSV каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_h = [res['std_h'] for res in results]
+        stds_s = [res['std_s'] for res in results]
+        stds_v = [res['std_v'] for res in results]
+
+        ax2.bar(x - width, stds_h, width, label='Hue', color='purple')
+        ax2.bar(x, stds_s, width, label='Saturation', color='green')
+        ax2.bar(x + width, stds_v, width, label='Value', color='blue')
+        ax2.set_title('Стандартные отклонения HSV каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    elif space == 'lab':
+        # LAB диаграммы
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+        # Средние значения
+        means_l = [res['m_l'] for res in results]
+        means_a = [res['m_a'] for res in results]
+        means_b = [res['m_b'] for res in results]
+
+        x = np.arange(len(tags))
+        width = 0.25
+
+        ax1.bar(x - width, means_l, width, label='L', color='gray')
+        ax1.bar(x, means_a, width, label='A', color='red')
+        ax1.bar(x + width, means_b, width, label='B', color='blue')
+        ax1.set_title('Средние значения LAB каналов')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(tags)
+        ax1.legend()
+
+        # Стандартные отклонения
+        stds_l = [res['std_l'] for res in results]
+        stds_a = [res['std_a'] for res in results]
+        stds_b = [res['std_b'] for res in results]
+
+        ax2.bar(x - width, stds_l, width, label='L', color='gray')
+        ax2.bar(x, stds_a, width, label='A', color='red')
+        ax2.bar(x + width, stds_b, width, label='B', color='blue')
+        ax2.set_title('Стандартные отклонения LAB каналов')
+        ax2.set_xticks(x)
+        ax2.set_xticklabels(tags)
+        ax2.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# Пример использования:
+# Получаем результаты для разных классов
+results = [
+    test_img_folder_rgb("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_contrast"),
+    test_img_folder_rgb("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_contrast"),
+    test_img_folder_rgb("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_contrast"),
+    test_img_folder_rgb("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_contrast")
+]
+
+# Строим диаграммы для RGB
+plot_color_features(results, space='rgb')
+
+# Строим диаграммы для Grayscale
+plot_color_features(results, space='gray')
+
+
+
+
+hsv_results = [
+    test_img_folder_hsv("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_contrast"),
+    test_img_folder_hsv("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_contrast"),
+    test_img_folder_hsv("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_contrast"),
+    test_img_folder_hsv("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_contrast")
+]
+plot_color_features(hsv_results, space='hsv')
+
+
+yuv_results = [
+    test_img_folder_yuv("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_contrast"),
+    test_img_folder_yuv("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_contrast"),
+    test_img_folder_yuv("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_contrast"),
+    test_img_folder_yuv("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_contrast")
+]
+plot_color_features(yuv_results, space='yuv')
+
+lab_results = [
+    test_img_folder_lab("Healthy", "/content/drive/MyDrive/Processed Data/Healthy_corrected_contrast"),
+    test_img_folder_lab("BlackRot", "/content/drive/MyDrive/Processed Data/BlackRot_corrected_contrast"),
+    test_img_folder_lab("ESCA", "/content/drive/MyDrive/Processed Data/ESCA_corrected_contrast"),
+    test_img_folder_lab("LeafBlight", "/content/drive/MyDrive/Processed Data/LeafBlight_corrected_contrast")
+]
+plot_color_features(lab_results, space='lab')
+
+
+
 
 
